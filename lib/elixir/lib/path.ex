@@ -466,11 +466,13 @@ defmodule Path do
       "/foo/bar"
 
   """
-  @spec join([t]) :: binary
+  @spec join(nonempty_list(t)) :: binary
   def join([name1, name2 | rest]), do:
     join([join(name1, name2) | rest])
+  def join([name]) when is_integer(name), do:
+    to_string([name])
   def join([name]), do:
-    name
+    to_string(name)
 
   @doc """
   Joins two paths.
@@ -488,6 +490,11 @@ defmodule Path do
 
   """
   @spec join(t, t) :: binary
+  def join(left, right) when is_integer(left) do
+    left    = IO.chardata_to_string([left])
+    os_type = major_os_type()
+    do_join(left, right, os_type) |> remove_dir_sep(os_type)
+  end
   def join(left, right) do
     left    = IO.chardata_to_string(left)
     os_type = major_os_type()

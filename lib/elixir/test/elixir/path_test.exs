@@ -208,7 +208,9 @@ defmodule PathTest do
   test "join" do
     assert Path.join([""]) == ""
     assert Path.join(["foo"]) == "foo"
+    assert Path.join(['foo']) == "foo"
     assert Path.join(["/", "foo", "bar"]) == "/foo/bar"
+    assert Path.join([?/, 'foo', "bar"]) == "/foo/bar"
     assert Path.join(["~", "foo", "bar"]) == "~/foo/bar"
     assert Path.join(['/foo/', "/bar/"]) == "/foo/bar"
     assert Path.join(["/", ""]) == "/"
