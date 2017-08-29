@@ -829,6 +829,27 @@ defmodule Kernel.WarningTest do
     end) =~ "key :__struct__ is ignored when using structs"
   end
 
+  test "catch comes before rescue in try block" do
+    output = capture_err(fn ->
+      Code.eval_string """
+        defmodule TryCatch do
+          def before_rescue do
+            try do
+              IO.puts("Trying!!")
+            catch
+              _ ->
+                IO.puts("Caught!!")
+            rescue
+              _ ->
+                IO.puts("Error!!")
+            end
+          end
+        end
+      """
+    end)
+    assert output =~ "catch should always come after rescue in a try/do block"
+  end
+
   defp purge(list) when is_list(list) do
     Enum.each list, &purge/1
   end
