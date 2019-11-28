@@ -378,7 +378,22 @@ defmodule ExUnit.Formatter do
         {left, right}
 
       nil ->
-        {if_value(left, inspect), if_value(right, inspect)}
+        left =
+          cond do
+            Macro.quoted_literal?(left) ->
+              if_value(left, inspect)
+
+            Macro.validate(left) == :ok ->
+              left
+              |> Diff.to_algebra(& &1)
+              |> Algebra.nest(padding_size)
+              |> Algebra.format(content_width)
+
+            true ->
+              if_value(left, inspect)
+          end
+
+        {left, if_value(right, inspect)}
     end
   end
 
